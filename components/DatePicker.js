@@ -6,7 +6,7 @@ import { MKButton, MKColor,
     mdl, } from 'react-native-material-kit';
 
 const DatePicker = (props) => {
-
+    console.log(props)
     return(
         <View>
             <Button onPress={props.on_date_pick} title='Choose date' />

@@ -1,9 +1,9 @@
 import React from 'react';
 
-export function collect_categories(form_objs){
-    let categories = {};
+export function collect_categories(form_objects){
+    let categories = {'Default': ['Default']};
 
-    form_objs.forEach(form_obj => {
+    form_objects.forEach(form_obj => {
         let category = form_obj.category;
         let sub_category = form_obj.sub_category;
         if(!categories.hasOwnProperty(category)){
@@ -15,4 +15,6 @@ export function collect_categories(form_objs){
 
     return categories;
 }
+
+export const string_format = require('string-format');
 

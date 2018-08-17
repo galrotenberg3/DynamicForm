@@ -13,22 +13,21 @@ export default class UserForm extends React.Component {
         super(props);
 
         // Connect to Db and pull forms
-        let form_objects = [{
+        const form_objects = [{
                             category: 'Sports',
                             sub_category: 'Tennis',
                             fields: [
                                 {
                                     name: 'Type of court',
-                                    description: 'Specify the court conditions.',
+                                    description: 'Specify the court conditions',
                                     type: 'combo_box',
                                     box_strings: ['Grass', 'Concrete']
                                 }
                             ]
                          },]
         let categories = utils.collect_categories(form_objects);
-
         this.state = {
-            from_objs: form_objects,
+            form_objects: form_objects,
             categories: categories,
             selected_category: 'Default',
             selected_sub_category: 'Default',
@@ -39,29 +38,30 @@ export default class UserForm extends React.Component {
             additional_data: null,
             current_form: {category: null, sub_category: null},
             field_values: {},
+            not_valid_fields: {},
         }
     }
 
     render() {
-        let form_fields = []
-        if (this.state.current_form.category && this.state.current_form.sub_category){
-            this.state.from_objs.forEach(form_obj => {
-                if(form_obj.category != this.state.current_form.category || form_obj.sub_category != this.state.current_form.sub_category){
-                    return;
-                }
-
-                form_fields = form_obj.fields.map(field => {
-                    return <FormField name={field.name}
-                                      description={field.description}
-                                      type={field.description}
-                                      max_value={field.max_value}
-                                      min_value={field.min_value}
-                                      box_strings={field.box_strings} />
-                })
+        var form_fields = null
+        this.state.form_objects.forEach(form_obj => {
+            if(form_obj.category != this.state.current_form.category || form_obj.sub_category != this.state.current_form.sub_category){
+                return;
+            }
+            
+            form_fields = form_obj.fields.map(field => {
+                return <FormField   key={field.name}
+                                    name={field.name}
+                                    description={field.description}
+                                    type={field.type}
+                                    max_value={field.max_value}
+                                    min_value={field.min_value}
+                                    box_strings={field.box_strings}
+                                    on_value_changed={this.on_form_field_changed}
+                                    invalid_value_cb={this.invalid_value_cb}
+                                    clean_invalid_value_cb={this.clean_invalid_value_cb} />
             })
-        }
-        console.log('============')
-        console.log(form_fields)
+        })
         
 
         return(
@@ -70,14 +70,14 @@ export default class UserForm extends React.Component {
                             selected_sub_category={this.state.selected_sub_category}
                             categories={this.state.categories}
                             on_category_changed={this.on_category_changed}
-                            on_categories_changed={this.on_categories_changed} /> 
+                            on_sub_category_changed={this.on_sub_category_changed} /> 
 
                 <DatePicker on_date_pick={this.on_date_pick}
                       show_date={this.state.show_date}
                       confirm_date={this.confirm_date}
                       cancel_date={this.cancel_date} />
 
-                <FormField />
+                {form_fields}
             </View>
         );
     }
@@ -85,7 +85,7 @@ export default class UserForm extends React.Component {
     on_category_changed = (category) => {
         this.setState(prev_state => {
             return {
-            from_objs: prev_state.form_objects,
+            form_objects: prev_state.form_objects,
             categories: prev_state.categories,
             selected_category: category,
             selected_sub_category: null,
@@ -96,14 +96,16 @@ export default class UserForm extends React.Component {
             additional_data: prev_state.additional_data,
             current_form: {category: null, sub_category: null},
             field_values: {},
+            not_valid_fields: prev_state.no_valid_fields,
             }
         })
     }
 
-    on_categories_changed = (category, sub_category) => {
+    on_sub_category_changed = (category, sub_category) => {
+        console.log(utils.string_format('changed categories to {0}\\{1}', category, sub_category))
         this.setState(prev_state => {
             return {
-                from_objs: prev_state.from_objs,
+                form_objects: prev_state.form_objects,
                 categories: prev_state.categories,
                 selected_category: category,
                 selected_sub_category: sub_category,
@@ -114,6 +116,7 @@ export default class UserForm extends React.Component {
                 additional_data: prev_state.additional_data,
                 current_form: {category: category, sub_category: sub_category},
                 field_values: prev_state.field_value,
+                not_valid_fields: prev_state.no_valid_fields,
                 }
         })
     }
@@ -124,7 +127,7 @@ export default class UserForm extends React.Component {
 
         thie.setState(prev_state => {
             return {
-                from_objs: prev_state.from_objs,
+                form_objects: prev_state.form_objects,
                 categories: prev_state.categories,
                 selected_category: prev_state.selected_category,
                 selected_sub_category: prev_state.sub_category,
@@ -135,6 +138,7 @@ export default class UserForm extends React.Component {
                 additional_data: prev_state.additional_data,
                 current_form: prev_state.current_form,
                 field_values: field_values,
+                not_valid_fields: prev_state.no_valid_fields,
             }
         })
     }
@@ -142,7 +146,7 @@ export default class UserForm extends React.Component {
     confirm_date = (date_value) => {
         this.setState(prev_state => {
             return {
-                from_objs: prev_state.from_objs,
+                form_objects: prev_state.form_objects,
                 categories: prev_state.categories,
                 selected_category: prev_state.selected_category,
                 selected_sub_category: prev_state.sub_category,
@@ -153,6 +157,7 @@ export default class UserForm extends React.Component {
                 additional_data: prev_state.additional_data,
                 current_form: prev_state.current_form,
                 field_values: prev_state.field_values,
+                not_valid_fields: prev_state.no_valid_fields,
             }
         })
     }
@@ -160,7 +165,7 @@ export default class UserForm extends React.Component {
     cancel_date = (_) => {
         this.setState(prev_state => {
             return {
-                from_objs: prev_state.from_objs,
+                form_objects: prev_state.form_objects,
                 categories: prev_state.categories,
                 selected_category: prev_state.selected_category,
                 selected_sub_category: prev_state.sub_category,
@@ -171,6 +176,7 @@ export default class UserForm extends React.Component {
                 additional_data: prev_state.additional_data,
                 current_form: prev_state.current_form,
                 field_values: prev_state.field_values,
+                not_valid_fields: prev_state.no_valid_fields,
             }
         })
     }
@@ -179,7 +185,7 @@ export default class UserForm extends React.Component {
         this.setState(prev_state => {
             let show_date = !prev_state.show_date;
             return {
-                from_objs: prev_state.from_objs,
+                form_objects: prev_state.form_objects,
                 categories: prev_state.categories,
                 selected_category: prev_state.selected_category,
                 selected_sub_category: prev_state.sub_category,
@@ -190,6 +196,49 @@ export default class UserForm extends React.Component {
                 additional_data: prev_state.additional_data,
                 current_form: prev_state.current_form,
                 field_values: prev_state.field_values,
+                not_valid_fields: prev_state.no_valid_fields,
+            }
+        })
+    }
+
+    invalid_value_cb = (field_name, error_msg) => {
+        this.setState(prev_state => {
+            let invalid_fields = prev_state.invalid_fields
+            invalid_fields[field_name] = error_msg
+            return {
+                form_objects: prev_state.form_objects,
+                categories: prev_state.categories,
+                selected_category: prev_state.selected_category,
+                selected_sub_category: prev_state.sub_category,
+                event_name: prev_state.event_name,
+                show_date: {show_date},
+                date: prev_state.date,
+                location: prev_state.location,
+                additional_data: prev_state.additional_data,
+                current_form: prev_state.current_form,
+                field_values: prev_state.field_values,
+                invalid_fields: invalid_fields,
+            }
+        })
+    }
+
+    clean_invalid_value_cb = (field_name) => {
+        this.setState(prev_state => {
+            let invalid_fields = prev_state.invalid_fields
+            delete invalid_fields[field_name]
+            return {
+                form_objects: prev_state.form_objects,
+                categories: prev_state.categories,
+                selected_category: prev_state.selected_category,
+                selected_sub_category: prev_state.sub_category,
+                event_name: prev_state.event_name,
+                show_date: {show_date},
+                date: prev_state.date,
+                location: prev_state.location,
+                additional_data: prev_state.additional_data,
+                current_form: prev_state.current_form,
+                field_values: prev_state.field_values,
+                invalid_fields: invalid_fields,
             }
         })
     }
