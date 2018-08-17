@@ -22,7 +22,12 @@ export default class UserForm extends React.Component {
                                     description: 'Specify the court conditions',
                                     type: 'combo_box',
                                     box_strings: ['Grass', 'Concrete']
-                                }
+                                },
+                                {
+                                    name: 'Check text boxes',
+                                    description: 'Enter free text',
+                                    type: 'string',
+                                },
                             ]
                          },]
         let categories = utils.collect_categories(form_objects);
@@ -50,6 +55,7 @@ export default class UserForm extends React.Component {
             }
             
             form_fields = form_obj.fields.map(field => {
+                // var current_value = this.state.field_values.hasOwnProperty(field.name) ? this.state.field_value[field_name] : null;
                 return <FormField   key={field.name}
                                     name={field.name}
                                     description={field.description}
@@ -65,19 +71,19 @@ export default class UserForm extends React.Component {
         
 
         return(
-            <View>
+            <View style={{flexDirection: 'column'}}>
                 <Categories selected_category={this.state.selected_category}
                             selected_sub_category={this.state.selected_sub_category}
                             categories={this.state.categories}
                             on_category_changed={this.on_category_changed}
                             on_sub_category_changed={this.on_sub_category_changed} /> 
 
-                <DatePicker on_date_pick={this.on_date_pick}
-                      show_date={this.state.show_date}
-                      confirm_date={this.confirm_date}
-                      cancel_date={this.cancel_date} />
-
                 {form_fields}
+
+                <DatePicker on_date_pick={this.on_date_pick}
+                            show_date={this.state.show_date}
+                            confirm_date={this.confirm_date}
+                            cancel_date={this.cancel_date} />
             </View>
         );
     }
@@ -115,17 +121,23 @@ export default class UserForm extends React.Component {
                 location: prev_state.location,
                 additional_data: prev_state.additional_data,
                 current_form: {category: category, sub_category: sub_category},
-                field_values: prev_state.field_value,
+                // Changed dynamic form, thus emptying the current one
+                field_values: {},
                 not_valid_fields: prev_state.no_valid_fields,
                 }
         })
     }
 
     on_form_field_changed = (field_name, field_value) =>{
-        let field_values = this.state.field_values;
+        console.log('=============')
+        console.log(field_name)
+        console.log(field_value)
+        console.log(this.state)
+        console.log('=============')
+        var field_values = this.state.field_values;
         field_values[field_name] = field_value;
 
-        thie.setState(prev_state => {
+        this.setState(prev_state => {
             return {
                 form_objects: prev_state.form_objects,
                 categories: prev_state.categories,

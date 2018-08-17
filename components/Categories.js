@@ -1,6 +1,11 @@
 import React from 'react';
 import { Picker, Text, View } from 'react-native';
 
+// Dropdown ref - https://www.npmjs.com/package/react-native-material-dropdown
+import { Dropdown } from 'react-native-material-dropdown';
+
+import styles from '../utils/styles';
+
 export default class Categories extends React.Component {
     constructor(props){
         super(props);
@@ -15,23 +20,32 @@ export default class Categories extends React.Component {
     
     render() {
         let categories= Object.keys(this.state.categories).map(item => {
-            return <Picker.Item label={item} value={item} key={item} />
+            // return <Picker.Item label={item} value={item} key={item} />
+            return {value: item}
         })
         let sub_categories = this.state.selected_category == null || this.state.selected_sub_category == 'Default' ? [] : this.state.categories[this.state.selected_category].map(item => {
-            return <Picker.Item label={item} value={item} key={item} />
+            // return <Picker.Item label={item} value={item} key={item} />
+            return {value: item}
         })
 
         return (
-            <View>
-                <Text>Made categories</Text>
-                <Picker onValueChange={this._on_category_changed}
+            <View style={{justifyContent:'flex-start',}}>
+                {/* <Picker onValueChange={this._on_category_changed}
                         selectedValue={this.state.selected_category} >
                     {categories}
-                </Picker>
-                <Picker onValueChange={this._on_sub_category_changed} 
+                </Picker> */}
+                <Dropdown label='Category'
+                          data={categories}
+                          onChangeText={this._on_category_changed}
+                          containerStyle={styles.CategoryPicker} />
+                {/* <Picker onValueChange={this._on_sub_category_changed} 
                         selectedValue={this.state.selected_sub_category} >
                     {sub_categories}
-                </Picker>
+                </Picker> */}
+                <Dropdown label='Sub-category'
+                          data={sub_categories}
+                          onChangeText={this._on_sub_category_changed}
+                          containerStyle={styles.CategoryPicker} />
             </View>
         )
     }
