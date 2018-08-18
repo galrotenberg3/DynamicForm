@@ -25,7 +25,6 @@ class DataMark extends React.Component {
     }
 
     render(){
-        console.log(this.state.data)
         return (
             <View isVisible={this.state.is_visible}>
             <Text onPress={this.pressed_for_details}>{this.state.mark}</Text>

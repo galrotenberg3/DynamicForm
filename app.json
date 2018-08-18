@@ -1,5 +1,16 @@
 {
   "expo": {
+    "name": "UserForm",
+    "version": "1.0.0",
+    "ios": {
+      "bundleIdentifier": "com.UserForm",
+    },
+    "android": {
+      "package": "com.UserForm",
+      "config": {
+        "googleMaps": { "apiKey": "AIzaSyBDRJUZ72rBVZEUNQMCpo5j4hLMYlb3P1k" }
+      }
+    },
     "sdkVersion": "27.0.0"
   }
 }

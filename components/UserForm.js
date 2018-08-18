@@ -1,7 +1,11 @@
 import React from 'react';
-import { View } from 'react-native';
+import { View, Button, Text } from 'react-native';
 
-
+// MapView ref - https://github.com/react-community/react-native-maps
+//import MapView from 'react-native-maps';
+import MapView from 'expo';
+// TextField ref - https://github.com/n4kz/react-native-material-textfield#properties
+import { TextField } from 'react-native-material-textfield';
 
 import Categories from './Categories';
 import FormField from './FormField';
@@ -78,12 +82,17 @@ export default class UserForm extends React.Component {
                             on_category_changed={this.on_category_changed}
                             on_sub_category_changed={this.on_sub_category_changed} /> 
 
-                {form_fields}
+                <TextField label='Event Name'
+                            value={this.state.field_values['event_name']}
+                            onChangeText={name => {this.on_form_field_changed('event_name', name)}} />
 
+                {form_fields}
                 <DatePicker on_date_pick={this.on_date_pick}
                             show_date={this.state.show_date}
                             confirm_date={this.confirm_date}
                             cancel_date={this.cancel_date} />
+                {this.state.field_values.hasOwnProperty('date') && <Text>{JSON.stringify(this.state.field_values['date'])}</Text>}
+                <Button title='Submit' onPress={this.submit_form} />
             </View>
         );
     }
@@ -129,11 +138,6 @@ export default class UserForm extends React.Component {
     }
 
     on_form_field_changed = (field_name, field_value) =>{
-        console.log('=============')
-        console.log(field_name)
-        console.log(field_value)
-        console.log(this.state)
-        console.log('=============')
         var field_values = this.state.field_values;
         field_values[field_name] = field_value;
 
@@ -153,9 +157,11 @@ export default class UserForm extends React.Component {
                 not_valid_fields: prev_state.no_valid_fields,
             }
         })
+        console.log(this.state.field_values);
     }
 
     confirm_date = (date_value) => {
+        this.on_form_field_changed('date', date_value)
         this.setState(prev_state => {
             return {
                 form_objects: prev_state.form_objects,
@@ -253,5 +259,9 @@ export default class UserForm extends React.Component {
                 invalid_fields: invalid_fields,
             }
         })
+    }
+
+    submit_form = () => {
+
     }
 }

@@ -7,6 +7,7 @@ import { Dropdown } from 'react-native-material-dropdown';
 import { TextField } from 'react-native-material-textfield';
 
 import DataMark from './DataMark';
+import * as utils from '../utils/utils';
 
 import {
     MKTextField,
@@ -15,7 +16,6 @@ import {
   } from 'react-native-material-kit';
 
 const FormField = (props) => {
-    console.log(props)
     var field = null;
     var _on_value_changed = null
     if(props.type == 'combo_box'){
@@ -46,7 +46,9 @@ const FormField = (props) => {
         var max_validation = props.max_value ? (value) => {return value < props.min_value} : (value) => {return True}
         const field_changed = (value) => {
             if(!min_validation(value) || !max_validation(value)){
-                props.invalid_value_cb(props.field_name, "'${props.field_name}' has to be in restriction of: ${props.min_value} - ${props.max_value}");
+                props.invalid_value_cb(props.field_name, utils.string_format("'{0}' has to be in restriction of: ${1} - ${2}", props.field_name,
+                                                                                                                                props.min_value,
+                                                                                                                                props.max_value));
             }
             else if(props.name in props.need_validate_values){
                 props.clean_invalid_value_cb(props.name)
